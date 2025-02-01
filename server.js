@@ -6,9 +6,14 @@ const axios = require('axios')
 const app = express()
 
 // Allow requests from the frontend URL
+
+// Allow requests from both frontend URLs
 app.use(
   cors({
-    origin: 'https://python-tutor-frontend-part.netlify.app', // Frontend URL
+    origin: [
+      'https://python-tutor-frontend-part.netlify.app', // Netlify frontend URL
+      'https://puneetharajkrcr6xarjscpa6spq.drops.nxtwave.tech', // NxtWave frontend URL
+    ],
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   }),
