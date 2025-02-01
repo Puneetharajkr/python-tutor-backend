@@ -5,9 +5,7 @@ const axios = require('axios')
 
 const app = express()
 
-// Allow requests from the frontend URL
-
-// Allow requests from both frontend URLs
+// Allow requests from both frontend URLs (Netlify and NxtWave)
 app.use(
   cors({
     origin: [
@@ -27,10 +25,17 @@ const PORT = process.env.PORT || 5000
 app.post('/api/python-tutor', async (req, res) => {
   const {question} = req.body // The question sent from frontend
 
+  // Log the incoming question for debugging purposes
+  console.log('Received question:', question)
+
   const apiKey = process.env.OPENAI_API_KEY // API key stored in environment variables
 
   if (!apiKey) {
     return res.status(500).json({error: 'API key is missing on the server.'})
+  }
+
+  if (!question) {
+    return res.status(400).json({error: 'Question is required.'})
   }
 
   try {
@@ -50,11 +55,20 @@ app.post('/api/python-tutor', async (req, res) => {
       },
     )
 
+    // Log the OpenAI API response for debugging
+    console.log('OpenAI response:', response.data)
+
     // Send the response back to the frontend with OpenAI's answer
     res.json({response: response.data.choices[0].text})
   } catch (error) {
-    res.status(500).json({error: 'Error contacting OpenAI API'})
-    console.error(error)
+    // Log the error for debugging
+    console.error('Error contacting OpenAI API:', error)
+
+    // Send a detailed error message to the frontend
+    res.status(500).json({
+      error: 'Error contacting OpenAI API',
+      details: error.response ? error.response.data : error.message,
+    })
   }
 })
 
